@@ -30,30 +30,31 @@ export default {
       const container = this.$refs.container
       
       e.preventDefault()
+      let data = e.data
+      if (data === '9') {
+        data = '九'
+      }
       if (inputType === 'insertText') {
-        let data = e.data
-        if (data === '9') {
-          data = '九'
-        }
         
-        this.text = this.text.slice(0, this.selectData.anchorOffset) + data + this.text.slice(this.selectData.anchorOffset)
+        this.text = this.text.slice(0, this.selectData.anchorOffset) + data + this.text.slice(this.selectData.focusOffset)
 
         this.selectData.anchorOffset += data.length
-        
-        await this.$nextTick()
-        const range = document.createRange()
-        range.setStart(container.childNodes[0], this.selectData.anchorOffset)
-        range.setEnd(container.childNodes[0], this.selectData.anchorOffset)
-        window.getSelection().removeAllRanges()
-        window.getSelection().addRange(range)
       }
       if (inputType === 'deleteContentBackward') {
         if (this.selectData.anchorOffset === this.selectData.focusOffset && this.selectData.focusOffset) {
           this.text = this.text.slice(0, this.selectData.anchorOffset - 1) + this.text.slice(this.selectData.anchorOffset)
+          this.selectData.anchorOffset -= 1
         } else {
           this.text = this.text.slice(0, this.selectData.anchorOffset) + this.text.slice(this.selectData.focusOffset)
         }
+        
       }
+      await this.$nextTick()
+      const range = document.createRange()
+      range.setStart(container.childNodes[0], this.selectData.anchorOffset)
+      range.setEnd(container.childNodes[0], this.selectData.anchorOffset)
+      window.getSelection().removeAllRanges()
+      window.getSelection().addRange(range)
     })
 
     document.addEventListener('selectionchange', () => {
